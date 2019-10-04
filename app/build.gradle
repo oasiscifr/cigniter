@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "io.github.trojan_gfw.igniter"
+        applicationId "io.github.oasiscifr.cigniter"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1

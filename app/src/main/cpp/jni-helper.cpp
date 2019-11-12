@@ -6,39 +6,48 @@
 #include <service.h>
 using namespace std;
 
-static thread *trojanThread = nullptr;
-static Config *trojanConfig = nullptr;
-static Service *trojanService = nullptr;
-
+static std::list<thread*> listOfThreads;
+static std::list<Service*> listOfServices;
+static std::list<Config*> listOfConfigs;
 
 static void startTrojan(const string &config)
 {
+    Config *trojanConfig;
+    Service *trojanService;
     trojanConfig = new Config();
     trojanConfig->load(config);
+    listOfConfigs.push_back(trojanConfig);
     trojanService = new Service(*trojanConfig);
     trojanService->run();
+    listOfServices.push_back(trojanService);
 }
 
 
 extern "C" {
     JNIEXPORT void JNICALL Java_io_github_trojan_1gfw_igniter_JNIHelper_trojan(JNIEnv *env, jclass, jstring config) {
-        if (trojanThread != nullptr)
-            return;
+        thread *trojanThread;
         const char *s = env->GetStringUTFChars(config, 0);
         string a(s);
         env->ReleaseStringUTFChars(config, s);
         trojanThread = new thread(startTrojan, a);
+        listOfThreads.push_back(trojanThread);
     }
 
     JNIEXPORT void JNICALL Java_io_github_trojan_1gfw_igniter_JNIHelper_stop(JNIEnv *env, jclass) {
-        if (trojanThread != nullptr) {
-            trojanService->stop();
-            trojanThread->join();
-            delete trojanService;
-            delete trojanConfig;
-            delete trojanThread;
-            trojanThread = nullptr;
+        for (auto const& i : listOfServices) {
+            i -> stop();
+            delete i;
         }
+        listOfServices.clear();
+        for (auto const& i : listOfThreads) {
+            i -> join();
+            delete i;
+        }
+        listOfThreads.clear();
+        for (auto const& i : listOfConfigs) {
+            delete i;
+        }
+        listOfConfigs.clear();
     }
 }
 

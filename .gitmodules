@@ -4,3 +4,6 @@
 [submodule "app/src/main/cpp/libs"]
 	path = app/src/main/cpp/libs
 	url = https://github.com/trojan-gfw/igniter-libs.git
+[submodule "app/src/main/rust/tun2tor"]
+	path = app/src/main/rust/tun2tor
+	url = https://github.com/oasiscifr/tun2tor.git

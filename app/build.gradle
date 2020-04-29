@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 ext.versionMajor = 0
 ext.versionMinor = 9
@@ -36,7 +37,7 @@ android {
         applicationId "io.github.trojan_gfw.igniter"
         minSdkVersion project.ext.minimumSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
-        versionCode GenerateVersionCode()
+        versionCode = GenerateVersionCode()
         versionName GenerateVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -53,6 +54,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     externalNativeBuild {
@@ -66,6 +68,12 @@ repositories {
     flatDir {
         dirs 'src/libs'
     }
+}
+
+cargo {
+    module  = "src/main/rust/tun2tor"       // Or whatever directory contains your Cargo.toml
+    libname = "tun2tor"          // Or whatever matches Cargo.toml's [package] name.
+    targets = ["arm", "arm64", "x86"]  // x86 See bellow for a longer list of options
 }
 
 dependencies {
